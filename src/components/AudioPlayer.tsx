@@ -1,12 +1,47 @@
-import React, { useState } from 'react';
-import { Player } from 'tone';
+import React, { useState } from "react";
+import {Destination, Player, ToneAudioBuffer} from "tone";
+
+export class AudioPlayerController {
+  constructor(private readonly player?: Player) {}
+  get isLoading(): boolean {
+    return this.player?.loaded ?? false;
+  }
+  public onPlay(): void {
+    this.player?.start();
+  }
+  public onStop(): void {
+    this.player?.stop();
+  }
+  public onLoop(loopStart: number, loopEnd: number): void {
+    this.player?.setLoopPoints(loopStart, loopEnd);
+    this.player?.set({
+      ...(this.player?.get() ?? {}),
+      loopEnd,
+      loopStart,
+      autostart: true,
+    });
+  }
+
+  public chainFx(fx: ToneAudioBuffer[]) {
+    this.player?.chain(...fx, Destination)
+  }
+}
 
 interface AudioPlayerProps {
   player: Player | null;
-  activate: boolean;
+  activate?: boolean;
+  onStart?: () => void;
+  onStop?: () => void;
+  onLoopSubmit?: () => void;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
+const AudioPlayer: React.FC<AudioPlayerProps> = ({
+  player,
+  activate,
+  onStart,
+  onStop,
+  onLoopSubmit,
+}) => {
   const [volume, setVolume] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [loopStart, setLoopStart] = useState(0);
@@ -45,10 +80,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
 
   return (
     <div>
-      <button disabled={!activate} onClick={() => player?.start()}>
+      <button disabled={!activate} onClick={() => onStart?.call(this)}>
         Play
       </button>
-      <button onClick={() => player?.stop()}>Stop</button>
+      <button onClick={() => onStop?.call(this)}>Stop</button>
       <br />
       <form onSubmit={changeLoopPoints}>
         <div>

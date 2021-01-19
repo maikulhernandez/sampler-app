@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Player,
   EQ3,
@@ -7,15 +7,17 @@ import {
   FeedbackDelay,
   Waveform,
   Destination,
-} from 'tone';
-import AudioPlayer from './AudioPlayer';
-import AudioFilter from './AudioFilter';
-import AudioDelay from './AudioDelay';
-import Equalizer from './Equalizer';
-import AudioChorus from './AudioChorus';
-// import AudioWaveform from './AudioWaveform';
+} from "tone";
+import AudioPlayer, { AudioPlayerController } from "./AudioPlayer";
+import AudioFilter from "./AudioFilter";
+import AudioDelay from "./AudioDelay";
+import Equalizer from "./Equalizer";
+import AudioChorus from "./AudioChorus";
 
-const App: React.FC = () => {
+interface AppProps {
+  playerController?: AudioPlayerController;
+}
+const App: React.FC<AppProps> = ({ playerController }) => {
   const [isLoaded, setLoaded] = useState(false);
   const [volume, setVolume] = useState(0);
 
@@ -27,11 +29,11 @@ const App: React.FC = () => {
   const waveform = useRef<Waveform | null>(null);
 
   useEffect(() => {
-    player.current = new Player('heal-6.wav', () => {
+    player.current = new Player("heal-6.wav", () => {
       setLoaded(true);
     });
     eq.current = new EQ3();
-    filter.current = new Filter(0, 'allpass', -48);
+    filter.current = new Filter(0, "allpass", -48);
     chorus.current = new Chorus();
     delay.current = new FeedbackDelay();
     waveform.current = new Waveform();
@@ -55,7 +57,12 @@ const App: React.FC = () => {
   return (
     <div>
       {/* <AudioWaveform waveform={waveform.current} /> */}
-      <AudioPlayer activate={isLoaded} player={player.current} />
+      <AudioPlayer
+        activate={playerController?.isLoading}
+        player={player.current}
+        onStart={playerController?.onPlay.bind(playerController)}
+        onStop={playerController?.onStop.bind(playerController)}
+      />
       <Equalizer eq={eq.current} />
       <AudioFilter filter={filter.current} />
       <AudioChorus chorus={chorus.current} />

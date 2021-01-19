@@ -12,3 +12,6 @@ $ cat .gitattributes
 *.aiff binary
 *.mp3 binary
 *.wav binary
+
+*.png binary
+*.ico binary

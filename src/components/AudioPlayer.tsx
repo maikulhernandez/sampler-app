@@ -1,11 +1,8 @@
-import React, { useState } from "react";
-import {Destination, Player, ToneAudioBuffer} from "tone";
+import React, { useEffect, useState } from "react";
+import { Player, ToneAudioNode } from "tone";
 
 export class AudioPlayerController {
-  constructor(private readonly player?: Player) {}
-  get isLoading(): boolean {
-    return this.player?.loaded ?? false;
-  }
+  constructor(public readonly player?: Player) {}
   public onPlay(): void {
     this.player?.start();
   }
@@ -22,8 +19,8 @@ export class AudioPlayerController {
     });
   }
 
-  public chainFx(fx: ToneAudioBuffer[]) {
-    this.player?.chain(...fx, Destination)
+  public chainFx(fx: ToneAudioNode[]) {
+    this.player?.chain(...fx);
   }
 }
 
@@ -46,6 +43,8 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [loopStart, setLoopStart] = useState(0);
   const [loopEnd, setLoopEnd] = useState(1);
+
+  useEffect(() => {}, [activate]);
 
   const changeVolume = (event: React.FormEvent<HTMLInputElement>) => {
     setVolume(parseInt(event.currentTarget.value));

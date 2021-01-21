@@ -1,10 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./components/App";
-import { AudioPlayerController } from "./components/AudioPlayer";
-import { Player } from "tone";
+import { AudioPlayerControllerPt2 } from "./components/AudioPlayer";
 
-const createPlayerController: () => AudioPlayerController = () =>
-  new AudioPlayerController(new Player("heal-6.wav"));
-
-ReactDOM.render(<App playerController={createPlayerController()} />, document.querySelector("#root"));
+ReactDOM.render(
+  <App playerController2={AudioPlayerControllerPt2} />,
+  document.querySelector("#root")
+);

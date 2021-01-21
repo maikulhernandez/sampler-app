@@ -1,35 +1,64 @@
 import React, { useEffect, useState } from "react";
-import { Player, ToneAudioNode } from "tone";
+import { Destination, Player, ToneAudioBuffer, ToneAudioNode } from "tone";
 
-export class AudioPlayerController {
-  constructor(public readonly player?: Player) {}
-  public onPlay(): void {
-    this.player?.start();
-  }
-  public onStop(): void {
-    this.player?.stop();
-  }
-  public onLoop(loopStart: number, loopEnd: number): void {
-    this.player?.setLoopPoints(loopStart, loopEnd);
-    this.player?.set({
-      ...(this.player?.get() ?? {}),
+export interface AudioControllerProps {
+  playerFactory?: (url: string, onLoad: () => void) => Player;
+  component?: React.FC<AudioPlayerProps>;
+  fx?: ToneAudioNode[];
+}
+export const AudioPlayerControllerPt2 = (props: AudioControllerProps) => {
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const player = props?.playerFactory?.call(props, "heal-6.wav", () =>
+    setIsLoaded(true)
+  );
+
+  console.log('i am called');
+  player?.chain(Destination);
+  // useEffect(() => {
+  //   console.log('in use effect');
+  //   player?.chain(Destination);
+  // }, []);
+
+  const onLoopSubmit = (loopStart: number, loopEnd: number) => {
+    player?.setLoopPoints(loopStart, loopEnd);
+    player?.set({
+      ...(player?.get() ?? {}),
       loopEnd,
       loopStart,
       autostart: true,
     });
-  }
+  };
 
-  public chainFx(fx: ToneAudioNode[]) {
-    this.player?.chain(...fx);
-  }
-}
+  const onStart = () => {
+    setIsPlaying(true);
+    player?.start?.call(player);
+  };
+  const onStop = () => {
+    console.log("stop");
+    setIsPlaying(false);
+    player?.stop?.call(player);
+  };
 
-interface AudioPlayerProps {
-  player: Player | null;
+  return (
+    props.component?.call(props, {
+      player,
+      activate: isLoaded,
+      onStart,
+      onStop,
+      onLoopSubmit,
+      isPlaying,
+    }) ?? <div>No component passed</div>
+  );
+};
+
+export interface AudioPlayerProps {
+  player?: Player;
+  isPlaying?: boolean;
   activate?: boolean;
   onStart?: () => void;
   onStop?: () => void;
-  onLoopSubmit?: () => void;
+  onLoopSubmit?: (loopStart: number, loopEnd: number) => void;
 }
 
 const AudioPlayer: React.FC<AudioPlayerProps> = ({
@@ -38,13 +67,14 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   onStart,
   onStop,
   onLoopSubmit,
+  isPlaying,
 }) => {
   const [volume, setVolume] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [loopStart, setLoopStart] = useState(0);
   const [loopEnd, setLoopEnd] = useState(1);
 
-  useEffect(() => {}, [activate]);
+  useEffect(() => {}, []);
 
   const changeVolume = (event: React.FormEvent<HTMLInputElement>) => {
     setVolume(parseInt(event.currentTarget.value));
@@ -79,10 +109,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
 
   return (
     <div>
-      <button disabled={!activate} onClick={() => onStart?.call(this)}>
-        Play
-      </button>
-      <button onClick={() => onStop?.call(this)}>Stop</button>
+      {!isPlaying ? (
+        <button disabled={!activate} onClick={() => onStart?.call(this)}>
+          Play
+        </button>
+      ) : (
+        <button onClick={() => onStop?.call(this)}>Stop</button>
+      )}
       <br />
       <form onSubmit={changeLoopPoints}>
         <div>

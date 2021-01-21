@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { ReactElement, useEffect, useRef, useState } from "react";
 import {
   Chorus,
   Destination,
@@ -8,40 +8,38 @@ import {
   Player,
   Waveform,
 } from "tone";
-import AudioPlayer, { AudioPlayerController } from "./AudioPlayer";
-import AudioFilter from "./AudioFilter";
-import AudioDelay from "./AudioDelay";
-import Equalizer from "./Equalizer";
-import AudioChorus from "./AudioChorus";
+import AudioPlayer, { AudioControllerProps } from "./AudioPlayer";
 
 interface AppProps {
-  playerController?: AudioPlayerController;
+  playerController2?: React.FC<AudioControllerProps>;
 }
-const App: React.FC<AppProps> = ({ playerController }) => {
+const App: React.FC<AppProps> = ({ playerController2 }) => {
   const [volume, setVolume] = useState(0);
-  const player = useRef<Player | null>(null);
+  const player = playerController2?.call(this, {
+    playerFactory: (url, onLoad) => new Player(url, onLoad),
+    component: AudioPlayer,
+  });
+  console.log('called app');
   const eq = useRef<EQ3 | null>(null);
   const filter = useRef<Filter | null>(null);
   const chorus = useRef<Chorus | null>(null);
   const delay = useRef<FeedbackDelay | null>(null);
   const waveform = useRef<Waveform | null>(null);
-
   useEffect(() => {
     eq.current = new EQ3();
     filter.current = new Filter(0, "allpass", -48);
     chorus.current = new Chorus();
     delay.current = new FeedbackDelay();
     waveform.current = new Waveform();
-
-    playerController?.chainFx([
-      eq.current,
-      filter.current,
-      chorus.current,
-      delay.current,
-      waveform.current,
-      Destination,
-    ]);
-  }, [playerController]);
+    // playerController?.chainFx([
+    //   eq.current,
+    //   filter.current,
+    //   chorus.current,
+    //   delay.current,
+    //   waveform.current,
+    //   Destination,
+    // ]);
+  }, []);
 
   const changeMasterVolume = (e: React.FormEvent<HTMLInputElement>) => {
     setVolume(parseInt(e.currentTarget.value));
@@ -49,30 +47,7 @@ const App: React.FC<AppProps> = ({ playerController }) => {
     Destination.volume.value = volume;
   };
 
-  return (
-    <div>
-      <button onClick={() => console.log(playerController?.player?.loaded)}></button>
-      <AudioPlayer
-        activate={playerController?.player?.loaded}
-        player={player.current}
-        onStart={playerController?.onPlay.bind(playerController)}
-        onStop={playerController?.onStop.bind(playerController)}
-      />
-      <Equalizer eq={eq.current} />
-      <AudioFilter filter={filter.current} />
-      <AudioChorus chorus={chorus.current} />
-      <AudioDelay delay={delay.current} />
-      Master Volume:
-      <input
-        type="range"
-        min="-69"
-        max="12"
-        onChange={changeMasterVolume}
-        value={volume}
-      />
-      {volume} db
-    </div>
-  );
+  return <div>{player}</div>;
 };
 
 export default App;

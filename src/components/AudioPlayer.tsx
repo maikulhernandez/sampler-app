@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Player } from 'tone';
+import Knob from './Knob';
 
 interface AudioPlayerProps {
   player: Player | null;
@@ -17,6 +18,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
     if (player) {
       player.volume.value = volume;
     }
+  };
+
+  const changeVolumeTEST = (value: number) => {
+    setVolume(value);
+    player?.set({ volume: volume });
   };
 
   const changePlaybackRate = (event: React.FormEvent<HTMLInputElement>) => {
@@ -99,6 +105,15 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
         />
         {volume}
       </div>
+      <Knob
+        size={100}
+        numTicks={25}
+        degrees={260}
+        min={-48}
+        max={12}
+        value={volume}
+        onChange={changeVolumeTEST}
+      />
     </div>
   );
 };

@@ -16,31 +16,31 @@ interface AppDeps {
   ) => Player;
   playerControllerFactory: (player: Player) => AudioPlayerController;
 }
-const bootstrap: () => AppDeps = () => {
-  return {
-    playerFactory: (url, onLoad, fx) =>
-      new Player(url, onLoad).chain(...(fx ?? []), Destination),
-    playerControllerFactory: (player: Player) => new PlayerController(player),
-  };
+const appDeps: AppDeps = {
+  playerFactory: (url, onLoad, fx) =>
+    new Player(url, onLoad).chain(...(fx ?? []), Destination),
+  playerControllerFactory: (player: Player) => new PlayerController(player),
 };
 
 const App: React.FC = () => {
-  const [playerLoaded, setPlayerLoaded] = useState<boolean>(false);
+  const [isPlayerLoaded, setPlayerLoaded] = useState<boolean>(false);
   const playerController = useRef<AudioPlayerController | null>(null);
-
-  let appDeps: AppDeps;
   useEffect(() => {
-    appDeps = bootstrap();
     playerController.current = appDeps.playerControllerFactory(
       appDeps.playerFactory("heal-6.wav", () => setPlayerLoaded(true), [])
     );
   }, []);
 
   return (
-    <AudioPlayer
-      isLoaded={playerLoaded}
-      controller={playerController.current ?? undefined}
-    ></AudioPlayer>
+    <div>
+      {isPlayerLoaded ? (
+        <AudioPlayer
+          controller={playerController.current ?? undefined}
+        ></AudioPlayer>
+      ) : (
+        "loading..."
+      )}
+    </div>
   );
 };
 

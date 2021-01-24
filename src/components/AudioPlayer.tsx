@@ -19,12 +19,10 @@ export class PlayerController implements AudioPlayerController {
 }
 
 export interface AudioPlayerProps {
-  isLoaded?: boolean;
   controller?: AudioPlayerController;
 }
 
 export const AudioPlayer: React.FC<AudioPlayerProps> = ({
-  isLoaded,
   controller,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -48,7 +46,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
       {isPlaying ? (
         <button onClick={handleOnStop}>stop</button>
       ) : (
-        <button disabled={!isLoaded} onClick={(e) => handleOnPlay()}>
+        <button onClick={(e) => handleOnPlay()}>
           play
         </button>
       )}

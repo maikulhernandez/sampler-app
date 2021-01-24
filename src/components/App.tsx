@@ -1,17 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Player } from "tone";
+import { Destination, Player, ToneAudioNode } from "tone";
 import { AudioPlayer, PlayerController } from "./AudioPlayer";
 
 export interface AudioPlayerController {
   play: () => void;
   stop: () => void;
+  setPlayerState: (state: { playbackRate?: number }) => void;
 }
 
 interface AppDeps {
+  playerFactory: (
+    url: string,
+    onLoad: () => void,
+    fx?: ToneAudioNode[]
+  ) => Player;
   playerControllerFactory: (player: Player) => AudioPlayerController;
 }
 const bootstrap: () => AppDeps = () => {
   return {
+    playerFactory: (url, onLoad, fx) =>
+      new Player(url, onLoad).chain(...(fx ?? []), Destination),
     playerControllerFactory: (player: Player) => new PlayerController(player),
   };
 };
@@ -24,7 +32,7 @@ const App: React.FC = () => {
   useEffect(() => {
     appDeps = bootstrap();
     playerController.current = appDeps.playerControllerFactory(
-      new Player("heal-6.wav", () => setPlayerLoaded(true)).chain()
+      appDeps.playerFactory("heal-6.wav", () => setPlayerLoaded(true), [])
     );
   }, []);
 

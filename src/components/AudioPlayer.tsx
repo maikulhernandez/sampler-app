@@ -1,20 +1,20 @@
-import React, { MouseEventHandler, useEffect, useState } from "react";
-import { Player, ToneAudioNode } from "tone";
+import React, { useState } from "react";
+import { Player } from "tone";
 import { AudioPlayerController } from "./App";
-
-export interface AudioControllerProps {
-  playerFactory?: (url: string, onLoad: () => void) => Player;
-  component?: React.FC<AudioPlayerProps>;
-  fx?: ToneAudioNode[];
-}
 
 export class PlayerController implements AudioPlayerController {
   constructor(private player?: Player) {}
+
   public play() {
     this.player?.start();
   }
+
   public stop() {
     this.player?.stop();
+  }
+
+  public setPlayerState(newState: { playbackRate?: number }): void {
+    this.player?.set(Object.assign({}, this.player?.get(), newState));
   }
 }
 
@@ -28,6 +28,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   controller,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const handleOnPlay = () => {
     controller?.play();
     setIsPlaying(true);
@@ -36,7 +37,12 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     controller?.stop();
     setIsPlaying(false);
   };
-  useEffect(() => {}, []);
+
+  const changePlaybackRate = (event: React.FormEvent<HTMLInputElement>) => {
+    const playbackRate = parseFloat(event.currentTarget.value);
+    setPlaybackRate(playbackRate);
+    controller?.setPlayerState({ playbackRate });
+  };
   return (
     <div>
       {isPlaying ? (
@@ -46,6 +52,18 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           play
         </button>
       )}
+      <div>
+        Playback Rate:
+        <input
+          value={playbackRate}
+          type="range"
+          min="0.000"
+          max="3"
+          step="0.05"
+          onChange={changePlaybackRate}
+        />
+        {playbackRate}
+      </div>
     </div>
   );
 };

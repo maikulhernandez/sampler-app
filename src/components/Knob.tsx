@@ -30,8 +30,8 @@ class Knob extends React.Component<KnobProps, KnobState> {
   static defaultProps: KnobProps = {
     degrees: 270,
     size: 150,
-    min: 10,
-    max: 30,
+    min: 0,
+    max: 1,
     value: 0,
     numTicks: 0,
     onChange: (newValue) => console.log(newValue),

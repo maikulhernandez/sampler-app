@@ -15,14 +15,12 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
 
   const changeVolume = (event: React.FormEvent<HTMLInputElement>) => {
     setVolume(parseInt(event.currentTarget.value));
-    if (player) {
-      player.volume.value = volume;
-    }
+    player?.set({ volume });
   };
 
   const changeVolumeTEST = (value: number) => {
     setVolume(value);
-    player?.set({ volume: volume });
+    player?.set({ volume });
   };
 
   const changePlaybackRate = (event: React.FormEvent<HTMLInputElement>) => {
@@ -105,9 +103,10 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ player, activate }) => {
         />
         {volume}
       </div>
+      Player Volume (KNOB):
       <Knob
         size={100}
-        numTicks={25}
+        numTicks={150}
         degrees={260}
         min={-48}
         max={12}

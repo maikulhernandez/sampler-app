@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PlayerController } from "./App";
 
-export const HooksPlayerController: PlayerController = ({ player }) => {
+export const HooksPlayerController: PlayerController = ({ player}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const onPlay = () => {
     player?.start();

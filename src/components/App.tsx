@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Destination, Player, ToneAudioNode } from "tone";
-import { AudioPlayer, PlayerController } from "./AudioPlayer";
+import { AudioPlayer, HooksPlayerController } from "./AudioPlayer";
 
-export interface AudioPlayerController {
-  play: () => void;
-  stop: () => void;
-  setPlayerState: (state: { playbackRate?: number }) => void;
+export interface PlayerState {
+  isPlaying: boolean;
+  onStop: () => void;
+  onPlay: () => void;
+  setAttribute: (newState: {}) => void;
 }
+export type PlayerController = (props: { player?: Player }) => PlayerState;
 
 interface AppDeps {
   playerFactory: (
@@ -14,28 +16,37 @@ interface AppDeps {
     onLoad: () => void,
     fx?: ToneAudioNode[]
   ) => Player;
-  playerControllerFactory: (player: Player) => AudioPlayerController;
+  playerController: PlayerController;
 }
 const appDeps: AppDeps = {
   playerFactory: (url, onLoad, fx) =>
     new Player(url, onLoad).chain(...(fx ?? []), Destination),
-  playerControllerFactory: (player: Player) => new PlayerController(player),
+  playerController: HooksPlayerController,
 };
 
 const App: React.FC = () => {
   const [isPlayerLoaded, setPlayerLoaded] = useState<boolean>(false);
-  const playerController = useRef<AudioPlayerController | null>(null);
+  const player = useRef<Player>();
+  const { isPlaying, onPlay, onStop, setAttribute } = appDeps.playerController({
+    player: player.current,
+  });
+
   useEffect(() => {
-    playerController.current = appDeps.playerControllerFactory(
-      appDeps.playerFactory("heal-6.wav", () => setPlayerLoaded(true), [])
+    // Init app dependencies
+    player.current = appDeps.playerFactory(
+      "heal-6.wav",
+      () => setPlayerLoaded(true),
+      []
     );
   }, []);
-
   return (
     <div>
       {isPlayerLoaded ? (
         <AudioPlayer
-          controller={playerController.current ?? undefined}
+          isPlaying={isPlaying}
+          onPlay={onPlay}
+          onStop={onStop}
+          onInputChange={setAttribute}
         ></AudioPlayer>
       ) : (
         "loading..."

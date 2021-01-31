@@ -1,7 +1,7 @@
-import { HooksPlayerController } from "./AudioPlayer";
+import {AudioPlayer, HooksPlayerController} from "./AudioPlayer";
 import { Player } from "tone";
-import { useEffect } from "react";
-import { render } from "@testing-library/react";
+import React, { useEffect } from "react";
+import { render, screen } from "@testing-library/react";
 jest.mock("tone", () => ({
   Player: jest.fn(),
 }));
@@ -25,4 +25,19 @@ test("AudioPlayerController", () => {
 
   // THEN
   expect(spy).toBeCalledTimes(1);
+});
+
+test('audio player shows stop when isPlaying true', () => {
+  render(<AudioPlayer
+      isPlaying={true}
+  ></AudioPlayer>)
+  screen.getByText('stop');
+});
+
+test('audio player shows stop when isPlaying false', () => {
+  render(<AudioPlayer
+      isPlaying={false}
+  >
+  </AudioPlayer>)
+  screen.getByText('testEl');
 });

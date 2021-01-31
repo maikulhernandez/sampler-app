@@ -32,6 +32,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
   onPlay,
   onStop,
   onInputChange,
+    children
 }) => {
   const [inputValue, setInputValue] = useState(1);
   const handleOnPlay = () => {
@@ -64,6 +65,9 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           onChange={handleInputChange}
         />
         {inputValue}
+      </div>
+      <div>
+        {children}
       </div>
     </div>
   );

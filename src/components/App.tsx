@@ -13,7 +13,6 @@ import AudioFilter from './AudioFilter';
 import AudioDelay from './AudioDelay';
 import Equalizer from './Equalizer';
 import AudioChorus from './AudioChorus';
-// import AudioWaveform from './AudioWaveform';
 
 const App: React.FC = () => {
   const [isLoaded, setLoaded] = useState(false);
@@ -30,6 +29,8 @@ const App: React.FC = () => {
     player.current = new Player('heal-6.wav', () => {
       setLoaded(true);
     });
+    player.current.set({ loop: true });
+
     eq.current = new EQ3();
     filter.current = new Filter(0, 'allpass', -48);
     chorus.current = new Chorus();
@@ -54,8 +55,12 @@ const App: React.FC = () => {
 
   return (
     <div>
-      {/* <AudioWaveform waveform={waveform.current} /> */}
       <AudioPlayer activate={isLoaded} player={player.current} />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
       <Equalizer eq={eq.current} />
       <AudioFilter filter={filter.current} />
       <AudioChorus chorus={chorus.current} />

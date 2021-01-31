@@ -15,6 +15,7 @@
 .knob .ticks .tick.active {
   box-shadow: inset 0 0 5px 2px #509eec, 0 0 0 1px #369;
 }
+
 .knob.outer {
   border-radius: 50%;
   border: 1px solid #222;
@@ -25,6 +26,7 @@
 .knob.inner {
   border-radius: 50%;
 }
+
 .knob.inner .grip {
   position: absolute;
   width: 5%;
